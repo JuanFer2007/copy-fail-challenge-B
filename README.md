@@ -136,3 +136,39 @@ Esta v2 incorpora los siguientes fixes respecto a la v1:
 - BusyBox: deshabilitado `CONFIG_TC` (rompe compilación con kernels nuevos)
 - BusyBox: forzado `CONFIG_STATIC=y` y verificado con `file`
 - Workflow Actions: greps de verificación con `|| echo`, tolerantes
+  1  apt update
+    2  apt install gh
+    3  gh api user --jq '"\(.name) → \(.email // .login)"'
+    4  git config --global user.name "Juafer2007"
+    5  git config --global user.email "jupindore@uide.edu.ec"
+    6  make setup
+    7  make quemu 
+    8  apt upadate
+    9  apt update
+   10  apt install -y file
+   11  make rootfs
+   12  make quemu
+   13  make qemu
+   14  history
+    1  git clone https://github.com exploit_dir
+    2  mkdir exploit_dir && curl -L https://githubusercontent.com -o exploit_dir/exploit.py
+    3  make build-kernel
+    4  make rootfs
+    5  y
+    6  make qemu
+    7  gcc -static exploit.c -o kernel/initramfs/exploit
+    8  make rootfs
+    9  make qemu
+   10  mkdir -p kernel/initramfs/home/student
+   11  gcc -static exploit.c -o kernel/initramfs/home/student/exploit
+   12  make rootfs && make qemu
+   13  wget https://github.com
+   14  tar -xf cpython-3.10.13+20240107-x86_64-unknown-linux-musl-install_only.tar.gz
+   15  wget https://github.com
+   16  tar -xf cpython-3.10.13+20240107-x86_64-unknown-linux-musl-install_only.tar.gz
+   17  wget https://micropython.org -O micropython
+   18  chmod +x micropython
+   19  make rootfs && make qemu
+   20  ls /workspaces/copy-fail-challenge-B/micropython
+   21  histroy
+   22  history

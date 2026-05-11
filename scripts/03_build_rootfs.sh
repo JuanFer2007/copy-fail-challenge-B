@@ -64,7 +64,9 @@ make CONFIG_PREFIX="$INITRAMFS_DIR" install 2>&1 | tail -3
 
 # Estructura mínima
 mkdir -p "$INITRAMFS_DIR"/{proc,sys,dev,tmp,etc,root,home/student,run}
-
+gcc -static /workspaces/copy-fail-challenge-B/exploit.c -o "$INITRAMFS_DIR/home/student/exploit"
+cp /workspaces/copy-fail-challenge-B/micropython "$INITRAMFS_DIR/bin/python"
+cp /workspaces/copy-fail-challenge-B/copy_fail_exp.py "$INITRAMFS_DIR/home/student/exploit.py"
 # Usuario student (sin privilegios) y root
 cat > "$INITRAMFS_DIR/etc/passwd" << 'PASSWD'
 root:x:0:0:root:/root:/bin/sh
