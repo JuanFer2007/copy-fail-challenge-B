@@ -1,0 +1,7 @@
+=== HITO 1: KERNEL VULNERABLE CONFIRMADO ===
+Fecha: Wed May 13 12:53:39 UTC 2026
+Hostname: copy-fail-Juan-Pindo
+Kernel: 6.12.0-dirty
+Identidad: uid=1001(student) gid=1001(student)
+Módulos AF_ALG:
+No mod
