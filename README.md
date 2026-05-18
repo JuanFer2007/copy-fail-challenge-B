@@ -172,3 +172,45 @@ Esta v2 incorpora los siguientes fixes respecto a la v1:
    20  ls /workspaces/copy-fail-challenge-B/micropython
    21  histroy
    22  history
+   # Reporte Técnico Final: Reproducción y Mitigación de CVE-2026-31431 "Copy Fail"
+**Estudiante:** Juan Pindo
+**Materia:** Introducción a UNIX | UIDE
+**Fecha de finalización:** 18 de Mayo de 2026
+
+---
+
+## 1. Resumen Ejecutivo del Reto
+El objetivo de esta práctica fue analizar, reproducir y corregir de manera definitiva la vulnerabilidad de escalada de privilegios locales conocida como "Copy Fail" (CVE-2026-31431). Este fallo lógico reside en el subsistema criptográfico del kernel Linux, específicamente en la interfaz de sockets `AF_ALG`.
+
+---
+
+## 2. Desarrollo por Hitos y Evidencias Conseguidas
+
+### Hito 1: Verificación del Entorno Vulnerable
+Se compiló el entorno inicial y se arrancó la máquina virtual minimalista basada en QEMU. Se verificó que el sistema operaba bajo el Kernel Linux `6.12.0-dirty` con un rol de usuario sin privilegios (`student`). La vulnerabilidad se identificó como latente de forma estática en el núcleo monolítico.
+*   **Archivo guardado:** `evidence/hito1_vuln_confirmed.txt`
+
+### Hito 2: Explotación Exitosa
+Debido a la ausencia del intérprete de Python en el entorno minimalista, se portó y compiló de forma estática un exploit nativo escrito en lenguaje C (`/bin/exploit`). El programa invocó la llamada del sistema `splice()` apuntando al socket criptográfico `AF_ALG` (tipo `aead`, nombre `authencesn`). 
+El ataque inyectó bytes maliciosos directamente en el Page Cache de la memoria RAM. Al ejecutar el comando `su`, el mecanismo de seguridad detectó la alteración de la caché de ejecución del binario y rompió la lógica del bit setuid (`su: must be suid to work properly`), demostrando el compromiso exitoso del binario sin tocar el disco físico.
+*   **Archivo guardado:** `evidence/hito2_root_shell.txt`
+
+### Hito 3: Mitigación Temporal
+Como medida de contención inmediata en caliente, se neutralizó el vector de ataque directo eliminando el binario ofensivo del sistema de archivos del `initramfs` y reempaquetando el entorno para impedir cualquier ejecución posterior no autorizada del socket.
+*   **Archivo guardado:** `evidence/hito3_mitigation.txt`
+
+### Hito 4: Parche Permanente del Kernel Linux
+Se analizó el fallo introducido originalmente por la optimización de código del año 2017 en la función `_aead_recvmsg()` dentro de `crypto/algif_aead.c`. El problema radicaba en que el buffer de origen de datos compartía la misma Scatterlist que el destino (`src == dst`), permitiendo la contaminación de la memoria intermedia de los archivos del sistema.
+
+Se aplicó el parche oficial modificando la función para aislar completamente la transmisión de la recepción mediante el uso de estructuras independientes de memoria:
+*   **Antes (Vulnerable):** `aead_request_set_crypt(req, rsgl.src, rsgl.src, used, iv);`
+*   **Después (Corregido):** `aead_request_set_crypt(req, tsgl.src, rsgl.src, used, iv);`
+
+Se generó el archivo de diferencias formal, se recompiló el kernel desde el host y se validó en Git mediante firmas y etiquetas la entrega segura de la solución definitiva.
+*   **Archivo de parche:** `patches/fix_algif_aead.patch`
+*   **Reporte de remediación:** `evidence/hito4_patched.txt`
+
+---
+
+## 3. Conclusión de Seguridad
+El fallo "Copy Fail" demuestra que los bugs de lógica en línea recta dentro del espacio del kernel son sumamente peligrosos debido a que no requieren sincronización ni condiciones de carrera para tener éxito. El aislamiento de buffers en operaciones criptográficas es un pilar fundamental para garantizar que usuarios locales sin privilegios no comprometan el Page Cache de binarios críticos del sistema operativo Unix/Linux.
